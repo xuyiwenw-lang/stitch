@@ -8,8 +8,8 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #f1f5f9;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+  background: #eef2f7;
   color: #1e293b;
   height: 100vh;
   display: flex;
@@ -19,321 +19,413 @@ body {
 
 /* ── Header ── */
 header {
-  padding: 11px 20px;
+  padding: 0 24px;
+  height: 52px;
   background: #fff;
   border-bottom: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   flex-shrink: 0;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  box-shadow: 0 1px 4px rgba(37,99,235,0.07);
 }
-header h1 { font-size: 17px; font-weight: 700; color: #2563eb; letter-spacing: -0.3px; }
-header span { font-size: 12px; color: #94a3b8; }
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.header-icon {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(37,99,235,0.3);
+}
+header h1 {
+  font-size: 16px; font-weight: 700; color: #1e3a8a; letter-spacing: -0.4px;
+}
+header .sub {
+  font-size: 11.5px; color: #94a3b8;
+  padding-left: 14px;
+  border-left: 1px solid #e2e8f0;
+  margin-left: 2px;
+}
+.header-spacer { flex: 1; }
+.header-badge {
+  font-size: 10.5px;
+  color: #3b82f6;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-weight: 500;
+}
 
 /* ── Layout ── */
-.app { display: flex; flex: 1; overflow: hidden; }
+.app { display: flex; flex: 1; overflow: hidden; position: relative; }
 
 /* ── Sidebar ── */
 .sidebar {
-  width: 214px;
+  width: 260px;
+  min-width: 180px;
+  max-width: 480px;
   background: #fff;
   border-right: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   flex-shrink: 0;
+  position: relative;
 }
 
+/* Resize handle */
+.sidebar-resizer {
+  position: absolute;
+  top: 0; right: -4px; bottom: 0;
+  width: 8px;
+  cursor: col-resize;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sidebar-resizer::after {
+  content: '';
+  width: 3px; height: 36px;
+  background: #cbd5e1;
+  border-radius: 2px;
+  transition: background 0.15s, height 0.15s;
+}
+.sidebar-resizer:hover::after,
+.sidebar-resizer.active::after {
+  background: #3b82f6;
+  height: 56px;
+}
+
+/* Upload zone */
 .upload-zone {
-  margin: 12px;
-  border: 2px dashed #cbd5e1;
-  border-radius: 10px;
-  padding: 18px 10px;
+  margin: 14px 14px 10px;
+  border: 2px dashed #bfdbfe;
+  border-radius: 12px;
+  padding: 22px 14px;
   text-align: center;
   cursor: pointer;
   transition: all 0.2s;
   flex-shrink: 0;
-  background: #f8fafc;
+  background: linear-gradient(160deg, #f0f7ff 0%, #f8fafc 100%);
+  position: relative;
+  overflow: hidden;
+}
+.upload-zone::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(59,130,246,0.06) 0%, transparent 70%);
+  pointer-events: none;
 }
 .upload-zone:hover, .upload-zone.drag-over {
   border-color: #3b82f6;
-  background: #eff6ff;
+  background: linear-gradient(160deg, #dbeafe 0%, #eff6ff 100%);
+  box-shadow: 0 0 0 4px rgba(59,130,246,0.08);
 }
-.upload-zone .icon { font-size: 24px; margin-bottom: 6px; }
-.upload-zone .label { font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 3px; }
-.upload-zone .hint { font-size: 10.5px; color: #94a3b8; line-height: 1.6; }
+.upload-zone .uz-icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+  display: block;
+  filter: drop-shadow(0 2px 4px rgba(37,99,235,0.15));
+}
+.upload-zone .uz-label {
+  font-size: 13px; font-weight: 600; color: #1e40af; margin-bottom: 4px;
+}
+.upload-zone .uz-hint {
+  font-size: 11px; color: #64748b; line-height: 1.7;
+}
+.upload-zone .uz-chips {
+  display: flex; gap: 4px; justify-content: center; margin-top: 10px; flex-wrap: wrap;
+}
+.uz-chip {
+  font-size: 10px; color: #3b82f6; background: #eff6ff;
+  border: 1px solid #bfdbfe; padding: 1px 7px; border-radius: 10px;
+}
 
-.sidebar-title {
+/* Sidebar section header */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
   padding: 6px 14px 4px;
-  font-size: 10px;
-  font-weight: 600;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
   flex-shrink: 0;
 }
+.section-title {
+  font-size: 10px; font-weight: 700; color: #94a3b8;
+  text-transform: uppercase; letter-spacing: 0.7px;
+}
+.section-count {
+  font-size: 10px; color: #3b82f6; background: #eff6ff;
+  padding: 1px 7px; border-radius: 10px; font-weight: 600;
+}
 
+/* Thumb grid */
 .thumb-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 4px 8px 8px;
+  flex: 1; overflow-y: auto; padding: 8px 10px 6px;
 }
 .thumb-list::-webkit-scrollbar { width: 4px; }
 .thumb-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
 
-.thumb-item {
+.thumb-grid {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 8px;
-  padding: 5px 6px;
-  border-radius: 7px;
-  cursor: grab;
-  border: 1px solid transparent;
-  margin-bottom: 3px;
-  transition: background 0.1s;
-  position: relative;
 }
-.thumb-item:hover { background: #f1f5f9; }
-.thumb-item.dragging { opacity: 0.3; }
+
+.thumb-item {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  cursor: grab;
+  position: relative;
+  border-radius: 8px;
+  padding: 0;
+  border: 1px solid transparent;
+  transition: border-color 0.12s;
+}
+.thumb-item:hover { border-color: #3b82f6; }
+.thumb-item.dragging { opacity: 0.25; }
 .thumb-item.drop-before::before {
-  content: '';
-  position: absolute;
-  top: -2px; left: 4px; right: 4px;
-  height: 2px;
-  background: #3b82f6;
-  border-radius: 1px;
+  content: ''; position: absolute;
+  top: -5px; left: 0; right: 0; height: 2px;
+  background: #3b82f6; border-radius: 1px;
+  box-shadow: 0 0 6px rgba(59,130,246,0.5);
 }
 .thumb-item.drop-after::after {
-  content: '';
-  position: absolute;
-  bottom: -2px; left: 4px; right: 4px;
-  height: 2px;
-  background: #3b82f6;
-  border-radius: 1px;
+  content: ''; position: absolute;
+  bottom: -5px; left: 0; right: 0; height: 2px;
+  background: #3b82f6; border-radius: 1px;
+  box-shadow: 0 0 6px rgba(59,130,246,0.5);
 }
 
+.thumb-img-wrap {
+  position: relative; width: 100%;
+}
 .thumb-img {
-  width: 36px;
-  height: 36px;
-  object-fit: cover;
-  border-radius: 4px;
-  flex-shrink: 0;
+  width: 100%; height: auto; object-fit: cover;
+  border-radius: 7px;
   background: #e2e8f0;
   border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  display: block;
 }
-.thumb-info { flex: 1; min-width: 0; }
-.thumb-name {
-  font-size: 10.5px;
-  color: #334155;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.thumb-num { font-size: 10px; color: #94a3b8; margin-bottom: 1px; }
 .thumb-del {
-  background: none;
-  border: none;
-  color: #cbd5e1;
-  cursor: pointer;
-  font-size: 16px;
-  padding: 1px 4px;
-  border-radius: 4px;
-  line-height: 1;
-  flex-shrink: 0;
+  position: absolute; top: 5px; right: 5px;
+  width: 20px; height: 20px;
+  background: rgba(0,0,0,0.5); color: #fff;
+  border: none; border-radius: 50%;
+  cursor: pointer; font-size: 13px; line-height: 20px;
+  text-align: center; padding: 0;
+  opacity: 0; transition: opacity 0.15s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
 }
-.thumb-del:hover { color: #ef4444; background: #fef2f2; }
+.thumb-item:hover .thumb-del { opacity: 1; }
+.thumb-del:hover { background: #ef4444; }
+
+.thumb-num {
+  font-size: 11px; font-weight: 600; color: #94a3b8;
+  line-height: 1; padding-bottom: 1px;
+}
+
+/* Clear all button area */
+.sidebar-footer {
+  padding: 10px 14px 14px;
+  flex-shrink: 0;
+  border-top: 1px solid #f1f5f9;
+}
+.btn-clear {
+  width: 100%;
+  padding: 8px 0;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
+  background: #fff5f5;
+  color: #ef4444;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.btn-clear:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  box-shadow: 0 1px 4px rgba(239,68,68,0.12);
+}
+.btn-clear:active { transform: scale(0.98); }
 
 /* ── Main ── */
-.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
 
+/* Preview */
 .preview-wrap {
-  flex: 1;
-  overflow-y: auto;
-  background: #f1f5f9;
-  display: flex;
-  justify-content: center;
-  padding: 28px 24px;
+  flex: 1; overflow-y: auto;
+  background: #eef2f7;
+  display: flex; justify-content: center;
+  padding: 32px 28px;
 }
 .preview-wrap::-webkit-scrollbar { width: 6px; }
 .preview-wrap::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
 
 .preview-inner {
-  width: 100%;
-  max-width: 440px;
+  width: 100%; max-width: 460px;
 }
 
 .empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 320px;
-  gap: 10px;
-  text-align: center;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 340px; gap: 12px; text-align: center;
 }
-.empty-state .big-icon { font-size: 52px; opacity: 0.25; }
-.empty-state p { font-size: 13px; color: #64748b; }
-.empty-state small { font-size: 11px; color: #94a3b8; }
+.empty-state .es-icon {
+  width: 72px; height: 72px; background: #fff;
+  border-radius: 18px; display: flex; align-items: center; justify-content: center;
+  font-size: 34px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+  border: 1px solid #e2e8f0;
+}
+.empty-state h3 { font-size: 15px; font-weight: 600; color: #334155; }
+.empty-state p { font-size: 12.5px; color: #64748b; line-height: 1.6; max-width: 240px; }
+.empty-state .es-formats {
+  display: flex; gap: 5px; margin-top: 2px;
+}
+.es-fmt {
+  font-size: 10.5px; color: #94a3b8; background: #f8fafc;
+  border: 1px solid #e2e8f0; padding: 2px 8px; border-radius: 8px;
+}
 
-/* ── Image block ── */
+/* Image blocks */
 .img-block {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
+  position: relative; width: 100%; overflow: hidden;
   user-select: none;
-  /* subtle shadow to frame each image */
-  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+  border-radius: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
+.img-block:first-child { border-radius: 8px 8px 0 0; }
+.img-block:last-child  { border-radius: 0 0 8px 8px; }
+.img-block:only-child  { border-radius: 8px; }
 .img-block img {
-  position: absolute;
-  pointer-events: none;
-  display: block;
+  position: absolute; pointer-events: none; display: block;
 }
 
-/* ── Crop handles (all 4 sides) ── */
+/* Crop handles */
 .h-top, .h-bottom, .h-left, .h-right {
-  position: absolute;
-  z-index: 10;
-  opacity: 0;
-  transition: opacity 0.15s;
+  position: absolute; z-index: 10;
+  opacity: 0; transition: opacity 0.15s;
 }
 .img-block:hover .h-top,
 .img-block:hover .h-bottom,
 .img-block:hover .h-left,
 .img-block:hover .h-right { opacity: 1; }
 
-/* Horizontal handles */
 .h-top, .h-bottom {
-  left: 0; right: 0;
-  height: 10px;
+  left: 0; right: 0; height: 10px;
   cursor: ns-resize;
-  background: rgba(37,99,235,0.55);
+  background: rgba(37,99,235,0.5);
   display: flex; align-items: center; justify-content: center;
 }
 .h-top { top: 0; }
 .h-bottom { bottom: 0; }
-.h-top:hover, .h-bottom:hover { background: rgba(37,99,235,0.85); height: 12px; opacity: 1; }
+.h-top:hover, .h-bottom:hover { background: rgba(37,99,235,0.82); height: 12px; opacity: 1; }
 .h-top::after, .h-bottom::after {
-  content: '';
-  width: 28px; height: 2.5px;
-  background: rgba(255,255,255,0.9);
-  border-radius: 2px;
+  content: ''; width: 30px; height: 3px;
+  background: rgba(255,255,255,0.92); border-radius: 2px;
 }
 
-/* Vertical handles */
 .h-left, .h-right {
-  top: 0; bottom: 0;
-  width: 10px;
+  top: 0; bottom: 0; width: 10px;
   cursor: ew-resize;
-  background: rgba(37,99,235,0.55);
+  background: rgba(37,99,235,0.5);
   display: flex; align-items: center; justify-content: center;
 }
 .h-left { left: 0; }
 .h-right { right: 0; }
-.h-left:hover, .h-right:hover { background: rgba(37,99,235,0.85); width: 12px; opacity: 1; }
+.h-left:hover, .h-right:hover { background: rgba(37,99,235,0.82); width: 12px; opacity: 1; }
 .h-left::after, .h-right::after {
-  content: '';
-  width: 2.5px; height: 28px;
-  background: rgba(255,255,255,0.9);
-  border-radius: 2px;
+  content: ''; width: 3px; height: 30px;
+  background: rgba(255,255,255,0.92); border-radius: 2px;
 }
 
-/* Always show handle outline on hover for clarity */
 .img-block:hover {
-  outline: 2px solid rgba(37,99,235,0.25);
+  outline: 2px solid rgba(59,130,246,0.4);
   outline-offset: 0px;
+  z-index: 1;
 }
 
-/* Info badge */
+/* Badge */
 .img-badge {
-  position: absolute;
-  top: 14px; right: 14px;
-  background: rgba(0,0,0,0.45);
-  color: rgba(255,255,255,0.9);
-  font-size: 10px;
-  padding: 2px 6px;
-  border-radius: 4px;
-  pointer-events: none;
-  z-index: 20;
-  opacity: 0;
-  transition: opacity 0.15s;
-  white-space: nowrap;
+  position: absolute; top: 12px; right: 12px;
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+  color: rgba(255,255,255,0.95); font-size: 10px;
+  padding: 2px 7px; border-radius: 5px;
+  pointer-events: none; z-index: 20;
+  opacity: 0; transition: opacity 0.15s; white-space: nowrap;
 }
 .img-block:hover .img-badge { opacity: 1; }
 
-/* Reset hint */
 .reset-hint {
-  position: absolute;
-  bottom: 14px; left: 50%;
+  position: absolute; bottom: 13px; left: 50%;
   transform: translateX(-50%);
-  background: rgba(0,0,0,0.55);
-  color: #fff;
-  font-size: 10px;
-  padding: 3px 8px;
-  border-radius: 4px;
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.15s;
-  z-index: 20;
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(4px);
+  color: #fff; font-size: 10px;
+  padding: 3px 9px; border-radius: 5px;
+  white-space: nowrap; pointer-events: none;
+  opacity: 0; transition: opacity 0.15s; z-index: 20;
 }
 .img-block:hover .reset-hint { opacity: 1; }
 
-/* Separator between images */
-.img-sep {
-  height: 3px;
-  background: #e2e8f0;
-  width: 100%;
-}
+/* Separator */
+.img-sep { height: 1px; background: rgba(226,232,240,0.8); width: 100%; }
 
 /* ── Action bar ── */
 .action-bar {
-  padding: 10px 16px;
+  padding: 11px 20px;
   background: #fff;
   border-top: 1px solid #e2e8f0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  display: flex; align-items: center; gap: 10px;
   flex-shrink: 0;
+  box-shadow: 0 -1px 4px rgba(0,0,0,0.04);
 }
 
 .width-ctrl {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: #64748b;
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: #64748b;
 }
-.width-ctrl label { white-space: nowrap; }
+.width-ctrl label { white-space: nowrap; font-weight: 500; }
 .width-ctrl input {
-  width: 64px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  color: #1e293b;
-  padding: 4px 7px;
-  border-radius: 5px;
-  font-size: 12px;
+  width: 68px; background: #f8fafc;
+  border: 1px solid #e2e8f0; color: #1e293b;
+  padding: 5px 8px; border-radius: 6px; font-size: 12px;
 }
-.width-ctrl input:focus { outline: none; border-color: #3b82f6; background: #fff; }
+.width-ctrl input:focus { outline: none; border-color: #3b82f6; background: #fff; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
 
-.bar-divider { width: 1px; height: 20px; background: #e2e8f0; margin: 0 2px; }
+.bar-divider { width: 1px; height: 22px; background: #e2e8f0; margin: 0 2px; }
 
 .btn {
-  padding: 7px 16px;
-  border-radius: 7px;
-  border: none;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  transition: all 0.15s;
-  white-space: nowrap;
+  padding: 7px 18px; border-radius: 8px; border: none;
+  cursor: pointer; font-size: 13px; font-weight: 500;
+  transition: all 0.15s; white-space: nowrap;
 }
-.btn:disabled { opacity: 0.35; cursor: not-allowed; }
-.btn-primary { background: #2563eb; color: #fff; }
-.btn-primary:not(:disabled):hover { background: #1d4ed8; }
-.btn-secondary { background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; }
-.btn-secondary:not(:disabled):hover { background: #e2e8f0; }
+.btn:disabled { opacity: 0.38; cursor: not-allowed; }
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(37,99,235,0.28);
+}
+.btn-primary:not(:disabled):hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  box-shadow: 0 3px 10px rgba(37,99,235,0.38);
+  transform: translateY(-1px);
+}
+.btn-primary:not(:disabled):active { transform: translateY(0); }
+.btn-secondary {
+  background: #f8fafc; color: #475569;
+  border: 1px solid #e2e8f0;
+}
+.btn-secondary:not(:disabled):hover {
+  background: #f1f5f9; border-color: #cbd5e1;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
 
 .status-msg { font-size: 11.5px; color: #94a3b8; margin-left: auto; transition: color 0.2s; }
 .status-msg.ok { color: #16a34a; }
@@ -341,21 +433,13 @@ header span { font-size: 12px; color: #94a3b8; }
 
 /* Toast */
 .toast {
-  position: fixed;
-  bottom: 68px;
-  left: 50%;
+  position: fixed; bottom: 72px; left: 50%;
   transform: translateX(-50%) translateY(8px);
-  background: #1e293b;
-  color: #f1f5f9;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  opacity: 0;
-  transition: all 0.22s;
-  pointer-events: none;
-  z-index: 100;
-  white-space: nowrap;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  background: #1e293b; color: #f1f5f9;
+  padding: 9px 18px; border-radius: 10px; font-size: 13px;
+  opacity: 0; transition: all 0.22s; pointer-events: none;
+  z-index: 100; white-space: nowrap;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
@@ -363,22 +447,45 @@ header span { font-size: 12px; color: #94a3b8; }
 <body>
 
 <header>
-  <h1>ImageStitch</h1>
-  <span>竖向拼接图片 · 四边均可拖拽裁切 · 拖拽调整顺序</span>
+  <div class="header-logo">
+    <div class="header-icon">🔗</div>
+    <h1>ImageStitch</h1>
+  </div>
+  <span class="sub">竖向拼接 · 四边裁切 · 拖拽排序</span>
+  <div class="header-spacer"></div>
+  <span class="header-badge">纯本地处理，不上传图片</span>
 </header>
 
 <div class="app">
 
   <!-- Sidebar -->
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
     <div class="upload-zone" id="uploadZone">
-      <div class="icon">📷</div>
-      <div class="label">点击 / 拖入图片</div>
-      <div class="hint">或 Ctrl+V 直接粘贴<br>最多 10 张</div>
+      <span class="uz-icon">📷</span>
+      <div class="uz-label">点击选择 / 拖入图片</div>
+      <div class="uz-hint">或直接 Ctrl+V 粘贴截图<br>最多添加 10 张</div>
+      <div class="uz-chips">
+        <span class="uz-chip">JPG</span>
+        <span class="uz-chip">PNG</span>
+        <span class="uz-chip">WebP</span>
+        <span class="uz-chip">GIF</span>
+      </div>
       <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
     </div>
-    <div class="sidebar-title" id="sidebarTitle" style="display:none">图片列表 · 拖拽排序</div>
+
+    <div class="section-header" id="sectionHeader" style="display:none">
+      <span class="section-title">图片列表</span>
+      <span class="section-count" id="sectionCount">0</span>
+    </div>
     <div class="thumb-list" id="thumbList"></div>
+
+    <div class="sidebar-footer" id="sidebarFooter" style="display:none">
+      <button class="btn-clear" id="btnClear">
+        <span>🗑</span> 一键清空
+      </button>
+    </div>
+
+    <div class="sidebar-resizer" id="sidebarResizer"></div>
   </div>
 
   <!-- Main -->
@@ -386,9 +493,15 @@ header span { font-size: 12px; color: #94a3b8; }
     <div class="preview-wrap" id="previewWrap">
       <div class="preview-inner" id="previewInner">
         <div class="empty-state" id="emptyState">
-          <div class="big-icon">🖼️</div>
-          <p>上传 2–10 张图片开始拼接</p>
-          <small>支持 JPG · PNG · WebP · GIF</small>
+          <div class="es-icon">🖼️</div>
+          <h3>添加图片开始拼接</h3>
+          <p>在左侧上传 2–10 张图片，支持拖拽调序、四边裁切</p>
+          <div class="es-formats">
+            <span class="es-fmt">JPG</span>
+            <span class="es-fmt">PNG</span>
+            <span class="es-fmt">WebP</span>
+            <span class="es-fmt">GIF</span>
+          </div>
         </div>
       </div>
     </div>
@@ -414,43 +527,64 @@ header span { font-size: 12px; color: #94a3b8; }
 <script>
 'use strict';
 
-/* ─── State ─────────────────────────────────────────────
-   Each image: { id, img, name, cT, cB, cL, cR }
-   c* = clip fraction (0–1) from that edge
-   visible portion = 1 - cL - cR (width) × 1 - cT - cB (height)
-──────────────────────────────────────────────────────── */
 let images = [];
 let idSeq = 0;
 let dragSrc = null;
 
 const MAX = 10;
-const MIN_VIS = 0.05; // minimum visible fraction per axis
+const MIN_VIS = 0.05;
 
-/* ─── DOM refs ────────────────────────────────────────── */
-const uploadZone   = document.getElementById('uploadZone');
-const fileInput    = document.getElementById('fileInput');
-const thumbList    = document.getElementById('thumbList');
-const sidebarTitle = document.getElementById('sidebarTitle');
-const previewInner = document.getElementById('previewInner');
-const emptyState   = document.getElementById('emptyState');
-const btnDownload  = document.getElementById('btnDownload');
-const btnCopy      = document.getElementById('btnCopy');
-const outWidthEl   = document.getElementById('outWidth');
-const statusMsg    = document.getElementById('statusMsg');
-const offscreen    = document.getElementById('offscreen');
-const toastEl      = document.getElementById('toast');
+const uploadZone    = document.getElementById('uploadZone');
+const fileInput     = document.getElementById('fileInput');
+const thumbList     = document.getElementById('thumbList');
+const sectionHeader = document.getElementById('sectionHeader');
+const sectionCount  = document.getElementById('sectionCount');
+const sidebarFooter = document.getElementById('sidebarFooter');
+const previewInner  = document.getElementById('previewInner');
+const emptyState    = document.getElementById('emptyState');
+const btnDownload   = document.getElementById('btnDownload');
+const btnCopy       = document.getElementById('btnCopy');
+const btnClear      = document.getElementById('btnClear');
+const outWidthEl    = document.getElementById('outWidth');
+const offscreen     = document.getElementById('offscreen');
+const statusMsg     = document.getElementById('statusMsg');
+const toastEl       = document.getElementById('toast');
 
-/* ─── Upload zone ─────────────────────────────────────── */
+/* ── Sidebar resize ── */
+const sidebar = document.getElementById('sidebar');
+const resizer = document.getElementById('sidebarResizer');
+resizer.addEventListener('mousedown', e => {
+  e.preventDefault();
+  resizer.classList.add('active');
+  const startX = e.clientX;
+  const startW = sidebar.offsetWidth;
+  const onMove = e => {
+    const w = Math.max(180, Math.min(480, startW + e.clientX - startX));
+    sidebar.style.width = w + 'px';
+  };
+  const onUp = () => {
+    resizer.classList.remove('active');
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  };
+  document.body.style.cursor = 'col-resize';
+  document.body.style.userSelect = 'none';
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+});
+
+/* ── Upload ── */
 uploadZone.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', e => { addFiles(Array.from(e.target.files)); fileInput.value = ''; });
 uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
-uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('dragleave', e => { if (!uploadZone.contains(e.relatedTarget)) uploadZone.classList.remove('drag-over'); });
 uploadZone.addEventListener('drop', e => {
   e.preventDefault(); uploadZone.classList.remove('drag-over');
   addFiles(Array.from(e.dataTransfer.files));
 });
 
-/* Drop on preview area */
 document.getElementById('previewWrap').addEventListener('dragover', e => {
   if (e.dataTransfer.types.includes('Files')) e.preventDefault();
 });
@@ -458,7 +592,7 @@ document.getElementById('previewWrap').addEventListener('drop', e => {
   e.preventDefault(); addFiles(Array.from(e.dataTransfer.files));
 });
 
-/* ─── Paste ───────────────────────────────────────────── */
+/* ── Paste ── */
 document.addEventListener('paste', e => {
   const items = Array.from(e.clipboardData.items).filter(i => i.type.startsWith('image/'));
   if (!items.length) return;
@@ -469,7 +603,15 @@ document.addEventListener('paste', e => {
   });
 });
 
-/* ─── Add / load ──────────────────────────────────────── */
+/* ── Clear all ── */
+btnClear.addEventListener('click', () => {
+  if (!images.length) return;
+  images = [];
+  render();
+  showToast('已清空所有图片');
+});
+
+/* ── Add / load ── */
 function addFiles(files) {
   const imgs = files.filter(f => f.type.startsWith('image/'));
   const slots = MAX - images.length;
@@ -488,35 +630,38 @@ function loadBlob(blob, name) {
   img.src = url;
 }
 
-function cleanName(n) { return n.replace(/\.[^.]+$/, '').slice(0, 26) || '图片'; }
-
+function cleanName(n) { return n.replace(/\.[^.]+$/, '').slice(0, 28) || '图片'; }
 function removeImage(idx) { images.splice(idx, 1); render(); }
 
-/* ─── Main render ─────────────────────────────────────── */
+/* ── Render ── */
 function render() {
   const has = images.length > 0;
   emptyState.style.display = has ? 'none' : '';
-  sidebarTitle.style.display = has ? '' : 'none';
+  sectionHeader.style.display = has ? '' : 'none';
+  sidebarFooter.style.display = has ? '' : 'none';
+  sectionCount.textContent = images.length;
   btnDownload.disabled = images.length < 2;
   btnCopy.disabled = images.length < 2;
   renderThumbs();
   renderPreview();
 }
 
-/* ─── Thumbnails ──────────────────────────────────────── */
+/* ── Thumbnails ── */
 function renderThumbs() {
   thumbList.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'thumb-grid';
+
   images.forEach((item, i) => {
     const el = document.createElement('div');
     el.className = 'thumb-item';
     el.draggable = true;
     el.innerHTML = `
-      <img class="thumb-img" src="${item.img.src}" alt="">
-      <div class="thumb-info">
-        <div class="thumb-num">${i + 1} / ${images.length}</div>
-        <div class="thumb-name">${escHtml(item.name)}</div>
+      <div class="thumb-img-wrap">
+        <img class="thumb-img" src="${item.img.src}" alt="">
+        <button class="thumb-del" title="删除">×</button>
       </div>
-      <button class="thumb-del" title="删除">×</button>
+      <span class="thumb-num">${i + 1}</span>
     `;
     el.querySelector('.thumb-del').addEventListener('click', e => { e.stopPropagation(); removeImage(i); });
 
@@ -526,112 +671,98 @@ function renderThumbs() {
       e.preventDefault();
       if (dragSrc === null || dragSrc === i) return;
       clearDropMarkers();
-      const mid = el.getBoundingClientRect().top + el.offsetHeight / 2;
-      el.classList.add(e.clientY < mid ? 'drop-before' : 'drop-after');
+      const mid = el.getBoundingClientRect().left + el.offsetWidth / 2;
+      el.classList.add(e.clientX < mid ? 'drop-before' : 'drop-after');
     });
     el.addEventListener('dragleave', () => clearDropMarkers());
     el.addEventListener('drop', e => {
       e.preventDefault();
       if (dragSrc === null || dragSrc === i) return;
-      const mid = el.getBoundingClientRect().top + el.offsetHeight / 2;
-      let target = e.clientY < mid ? i : i + 1;
+      const mid = el.getBoundingClientRect().left + el.offsetWidth / 2;
+      let target = e.clientX < mid ? i : i + 1;
       const moved = images.splice(dragSrc, 1)[0];
       if (dragSrc < target) target--;
       images.splice(target, 0, moved);
       dragSrc = null; clearDropMarkers(); render();
     });
 
-    thumbList.appendChild(el);
+    grid.appendChild(el);
   });
+
+  thumbList.appendChild(grid);
 }
 
 function clearDropMarkers() {
   thumbList.querySelectorAll('.thumb-item').forEach(el => el.classList.remove('drop-before', 'drop-after'));
 }
 
-/* ─── Preview ─────────────────────────────────────────── */
+/* ── Preview ── */
 function renderPreview() {
   Array.from(previewInner.children).forEach(el => { if (el !== emptyState) el.remove(); });
   if (!images.length) return;
-
-  const cw = previewInner.clientWidth || 400;
+  const cw = previewInner.clientWidth || 420;
   images.forEach((item, i) => {
     if (i > 0) {
       const sep = document.createElement('div');
       sep.className = 'img-sep';
       previewInner.appendChild(sep);
     }
-    previewInner.appendChild(makeBlock(item, cw));
+    previewInner.appendChild(makeBlock(item, i, cw));
   });
 }
 
-/* Compute display geometry for a given clip state + container width */
 function geom(item, cw) {
   const nw = item.img.naturalWidth, nh = item.img.naturalHeight;
-  const visW = nw * (1 - item.cL - item.cR);   // visible source width
-  const visH = nh * (1 - item.cT - item.cB);   // visible source height
-  const s = cw / visW;                          // scale: visible→display
+  const visW = nw * (1 - item.cL - item.cR);
+  const visH = nh * (1 - item.cT - item.cB);
+  const s = cw / visW;
   return {
-    fullW: nw * s, fullH: nh * s,   // full (uncropped) image display size
-    visDispH: visH * s,             // visible display height = block height
-    offL: item.cL * nw * s,        // pixel offset from left in display space
-    offT: item.cT * nh * s,        // pixel offset from top in display space
+    fullW: nw * s, fullH: nh * s,
+    visDispH: visH * s,
+    offL: item.cL * nw * s,
+    offT: item.cT * nh * s,
   };
 }
 
-function makeBlock(item, cw) {
+function makeBlock(item, idx, cw) {
   const block = document.createElement('div');
   block.className = 'img-block';
+  // corner radius handled via CSS :first-child / :last-child
 
   const imgEl = document.createElement('img');
   imgEl.src = item.img.src;
   imgEl.draggable = false;
   block.appendChild(imgEl);
 
-  // Info badge
   const badge = document.createElement('div');
   badge.className = 'img-badge';
   block.appendChild(badge);
 
-  // Reset hint
   const hint = document.createElement('div');
   hint.className = 'reset-hint';
-  hint.textContent = '双击边框重置裁切';
+  hint.textContent = '双击边框可重置该侧裁切';
   block.appendChild(hint);
 
-  // 4 crop handles
-  const hTop    = mkHandle('h-top');
-  const hBottom = mkHandle('h-bottom');
-  const hLeft   = mkHandle('h-left');
-  const hRight  = mkHandle('h-right');
-  block.appendChild(hTop);
-  block.appendChild(hBottom);
-  block.appendChild(hLeft);
-  block.appendChild(hRight);
+  const hTop = mkH('h-top'), hBottom = mkH('h-bottom');
+  const hLeft = mkH('h-left'), hRight = mkH('h-right');
+  block.append(hTop, hBottom, hLeft, hRight);
 
-  // Initial layout
   applyGeom(block, imgEl, badge, item, cw);
 
-  /* ── Double-click any handle → reset that edge ── */
-  hTop.addEventListener('dblclick', e => { e.preventDefault(); item.cT = 0; applyGeom(block, imgEl, badge, item, cw); });
+  hTop.addEventListener('dblclick',    e => { e.preventDefault(); item.cT = 0; applyGeom(block, imgEl, badge, item, cw); });
   hBottom.addEventListener('dblclick', e => { e.preventDefault(); item.cB = 0; applyGeom(block, imgEl, badge, item, cw); });
-  hLeft.addEventListener('dblclick', e => { e.preventDefault(); item.cL = 0; applyGeom(block, imgEl, badge, item, cw); });
-  hRight.addEventListener('dblclick', e => { e.preventDefault(); item.cR = 0; applyGeom(block, imgEl, badge, item, cw); });
+  hLeft.addEventListener('dblclick',   e => { e.preventDefault(); item.cL = 0; applyGeom(block, imgEl, badge, item, cw); });
+  hRight.addEventListener('dblclick',  e => { e.preventDefault(); item.cR = 0; applyGeom(block, imgEl, badge, item, cw); });
 
-  /* ── Drag handlers ── */
-  attachDrag(hTop, 'top', item, block, imgEl, badge, cw);
+  attachDrag(hTop,    'top',    item, block, imgEl, badge, cw);
   attachDrag(hBottom, 'bottom', item, block, imgEl, badge, cw);
-  attachDrag(hLeft, 'left', item, block, imgEl, badge, cw);
-  attachDrag(hRight, 'right', item, block, imgEl, badge, cw);
+  attachDrag(hLeft,   'left',   item, block, imgEl, badge, cw);
+  attachDrag(hRight,  'right',  item, block, imgEl, badge, cw);
 
   return block;
 }
 
-function mkHandle(cls) {
-  const d = document.createElement('div');
-  d.className = cls;
-  return d;
-}
+function mkH(cls) { const d = document.createElement('div'); d.className = cls; return d; }
 
 function applyGeom(block, imgEl, badge, item, cw) {
   const g = geom(item, cw);
@@ -640,52 +771,44 @@ function applyGeom(block, imgEl, badge, item, cw) {
   imgEl.style.height = g.fullH + 'px';
   imgEl.style.left   = -g.offL + 'px';
   imgEl.style.top    = -g.offT + 'px';
-  // badge: show crop % on each axis that is cropped
-  const wPct = Math.round((1 - item.cL - item.cR) * 100);
-  const hPct = Math.round((1 - item.cT - item.cB) * 100);
-  badge.textContent = (wPct < 100 || hPct < 100) ? `${wPct}% × ${hPct}%` : '原始';
+  const wP = Math.round((1 - item.cL - item.cR) * 100);
+  const hP = Math.round((1 - item.cT - item.cB) * 100);
+  badge.textContent = (wP < 100 || hP < 100) ? `${wP}% × ${hP}%` : '原始尺寸';
 }
 
 function attachDrag(handle, edge, item, block, imgEl, badge, cw) {
-  const isV = edge === 'top' || edge === 'bottom';   // vertical axis drag
+  const isV = edge === 'top' || edge === 'bottom';
 
-  const start = (clientX, clientY) => {
+  const startDrag = (clientX, clientY) => {
     const g = geom(item, cw);
-    const refDim = isV ? g.fullH : g.fullW;  // reference size for delta normalization
-    const startClip = { top: item.cT, bottom: item.cB, left: item.cL, right: item.cR };
+    const refDim = isV ? g.fullH : g.fullW;
+    const sc = { top: item.cT, bottom: item.cB, left: item.cL, right: item.cR };
 
-    const onMove = (cx, cy) => {
+    return (cx, cy) => {
       const delta = isV ? (cy - clientY) : (cx - clientX);
-      // Convert pixel delta → fraction of ORIGINAL image dimension
       const frac = delta / refDim;
-
-      if (edge === 'top')    item.cT = clamp(startClip.top    + frac, 0, 1 - startClip.bottom - MIN_VIS);
-      if (edge === 'bottom') item.cB = clamp(startClip.bottom - frac, 0, 1 - startClip.top    - MIN_VIS);
-      if (edge === 'left')   item.cL = clamp(startClip.left   + frac, 0, 1 - startClip.right  - MIN_VIS);
-      if (edge === 'right')  item.cR = clamp(startClip.right  - frac, 0, 1 - startClip.left   - MIN_VIS);
-
+      if (edge === 'top')    item.cT = clamp(sc.top    + frac, 0, 1 - sc.bottom - MIN_VIS);
+      if (edge === 'bottom') item.cB = clamp(sc.bottom - frac, 0, 1 - sc.top    - MIN_VIS);
+      if (edge === 'left')   item.cL = clamp(sc.left   + frac, 0, 1 - sc.right  - MIN_VIS);
+      if (edge === 'right')  item.cR = clamp(sc.right  - frac, 0, 1 - sc.left   - MIN_VIS);
       applyGeom(block, imgEl, badge, item, cw);
     };
-
-    return onMove;
   };
 
-  /* Mouse */
   handle.addEventListener('mousedown', e => {
     if (e.button !== 0) return;
     e.preventDefault();
-    const onMove = start(e.clientX, e.clientY);
+    const onMove = startDrag(e.clientX, e.clientY);
     const mm = e => onMove(e.clientX, e.clientY);
     const mu = () => { document.removeEventListener('mousemove', mm); document.removeEventListener('mouseup', mu); };
     document.addEventListener('mousemove', mm);
     document.addEventListener('mouseup', mu);
   });
 
-  /* Touch */
   handle.addEventListener('touchstart', e => {
     e.preventDefault();
     const t = e.touches[0];
-    const onMove = start(t.clientX, t.clientY);
+    const onMove = startDrag(t.clientX, t.clientY);
     const tm = e => { const t = e.touches[0]; onMove(t.clientX, t.clientY); };
     const te = () => { document.removeEventListener('touchmove', tm); document.removeEventListener('touchend', te); };
     document.addEventListener('touchmove', tm, { passive: false });
@@ -695,46 +818,40 @@ function attachDrag(handle, edge, item, block, imgEl, badge, cw) {
 
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
-/* ─── Re-render on window resize ─────────────────────── */
+/* ── Resize ── */
 let resizeTimer;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => { if (images.length) renderPreview(); }, 120);
 });
 
-/* ─── Canvas output ───────────────────────────────────── */
+/* ── Canvas ── */
 function buildCanvas() {
   const userW = parseInt(outWidthEl.value);
   const autoW = images.reduce((mx, item) => Math.max(mx, item.img.naturalWidth), 0);
   const outW = (userW > 0 && userW <= 8192) ? userW : autoW;
-
   let totalH = 0;
   const draws = images.map(item => {
     const nw = item.img.naturalWidth, nh = item.img.naturalHeight;
-    const srcX = Math.round(nw * item.cL);
-    const srcY = Math.round(nh * item.cT);
+    const srcX = Math.round(nw * item.cL), srcY = Math.round(nh * item.cT);
     const srcW = Math.round(nw * (1 - item.cL - item.cR));
     const srcH = Math.round(nh * (1 - item.cT - item.cB));
     const dstH = Math.round(srcH * outW / srcW);
     totalH += dstH;
     return { item, srcX, srcY, srcW, srcH, dstH };
   });
-
-  offscreen.width = outW;
-  offscreen.height = totalH;
+  offscreen.width = outW; offscreen.height = totalH;
   const ctx = offscreen.getContext('2d');
   ctx.clearRect(0, 0, outW, totalH);
-
   let y = 0;
   draws.forEach(({ item, srcX, srcY, srcW, srcH, dstH }) => {
     ctx.drawImage(item.img, srcX, srcY, srcW, srcH, 0, y, outW, dstH);
     y += dstH;
   });
-
   return offscreen;
 }
 
-/* ─── Download ────────────────────────────────────────── */
+/* ── Download ── */
 btnDownload.addEventListener('click', () => {
   if (images.length < 2) return;
   setStatus('生成中…', '');
@@ -752,7 +869,7 @@ btnDownload.addEventListener('click', () => {
   });
 });
 
-/* ─── Copy ────────────────────────────────────────────── */
+/* ── Copy ── */
 btnCopy.addEventListener('click', async () => {
   if (images.length < 2) return;
   setStatus('复制中…', '');
@@ -771,7 +888,7 @@ btnCopy.addEventListener('click', async () => {
   } catch (err) { setStatus('错误：' + err.message, 'err'); }
 });
 
-/* ─── Status / Toast ──────────────────────────────────── */
+/* ── Status / Toast ── */
 let statusTimer;
 function setStatus(msg, cls) {
   statusMsg.textContent = msg;
