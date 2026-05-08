@@ -463,7 +463,7 @@ header .sub {
     <div class="upload-zone" id="uploadZone">
       <span class="uz-icon">📷</span>
       <div class="uz-label">点击选择 / 拖入图片</div>
-      <div class="uz-hint">或直接 Ctrl+V 粘贴截图<br>最多添加 10 张</div>
+      <div class="uz-hint">或直接 Ctrl+V 粘贴截图<br>最多添加 15 张</div>
       <div class="uz-chips">
         <span class="uz-chip">JPG</span>
         <span class="uz-chip">PNG</span>
@@ -495,7 +495,7 @@ header .sub {
         <div class="empty-state" id="emptyState">
           <div class="es-icon">🖼️</div>
           <h3>添加图片开始拼接</h3>
-          <p>在左侧上传 2–10 张图片，支持拖拽调序、四边裁切</p>
+          <p>在左侧上传 2–15 张图片，支持拖拽调序、四边裁切</p>
           <div class="es-formats">
             <span class="es-fmt">JPG</span>
             <span class="es-fmt">PNG</span>
@@ -531,7 +531,7 @@ let images = [];
 let idSeq = 0;
 let dragSrc = null;
 
-const MAX = 10;
+const MAX = 15;
 const MIN_VIS = 0.05;
 
 const uploadZone    = document.getElementById('uploadZone');
