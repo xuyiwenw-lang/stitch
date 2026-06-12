@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-mono: "Courier Prime", "Courier New", monospace;
+  --font-hand: "Caveat", cursive;
+}
+
+@layer utilities {
+  /* Tactile cotton/linen canvas texture */
+  .bg-tactile {
+    background-color: #FDFCFB;
+    background-image: 
+      repeating-linear-gradient(0deg, transparent, transparent 6px, rgba(45, 41, 38, 0.01) 6px, rgba(45, 41, 38, 0.01) 7px),
+      repeating-linear-gradient(90deg, transparent, transparent 6px, rgba(45, 41, 38, 0.01) 6px, rgba(45, 41, 38, 0.01) 7px);
+  }
+  
+  .bg-workspace {
+    background-color: #F5F2ED;
+    background-image: 
+      radial-gradient(#2D2926 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.95;
+  }
+
+  /* Custom styled scrollbars */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #c6bcae;
+    border-radius: 9999px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #a39585;
+  }
+}
+
+/* Micro-shadows and stitch details */
+.card-stitched {
+  border: 2px dashed #b5a89b;
+  background-color: #fdfdfd;
+  box-shadow: 0 4px 20px rgba(74, 55, 40, 0.05);
+}
+
+.img-block-shadow {
+  box-shadow: 0 10px 30px rgba(45, 37, 28, 0.12);
+}
+
