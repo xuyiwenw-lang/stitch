@@ -41,15 +41,9 @@ export default function App() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const offscreenCanvasRef = useRef<HTMLCanvasElement>(null);
-  const cropDragRef = useRef<{
-    imageId: string;
-    edge: "top" | "bottom" | "left" | "right";
-    startX: number;
-    startY: number;
-    startVal: number;
-    fullW: number;
-    fullH: number;
-  } | null>(null);
+  // Live DOM refs so crop dragging can update the block directly (no React re-render = no lag)
+  const blockRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const imgRefs = useRef<Map<string, HTMLImageElement>>(new Map());
 
   /* ── File loading ── */
   const handleFiles = (files: File[]) => {
@@ -136,7 +130,7 @@ export default function App() {
     }
   };
 
-  /* ── Crop handle mouse/touch ── */
+  /* ── Crop handle mouse/touch (direct DOM = zero-lag, like the classic version) ── */
   const startCropDrag = (
     e: React.MouseEvent | React.TouchEvent,
     imageId: string,
@@ -146,38 +140,60 @@ export default function App() {
     e.stopPropagation();
     e.preventDefault();
     setSelectedId(imageId);
-    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
-    const geom = getGeom(item);
-    let startVal = edge === "top" ? item.cropT : edge === "bottom" ? item.cropB : edge === "left" ? item.cropL : item.cropR;
-    cropDragRef.current = { imageId, edge, startX: clientX, startY: clientY, startVal, fullW: geom.fullW, fullH: geom.fullH };
+
+    const startX = "touches" in e ? e.touches[0].clientX : e.clientX;
+    const startY = "touches" in e ? e.touches[0].clientY : e.clientY;
+    const nw = item.naturalWidth, nh = item.naturalHeight;
+    const mode = stitchMode;
+    const z = zoomLevel;
+
+    // Fixed sensitivity reference (image size in display px at drag start)
+    const geom0 = getGeom(item);
+    const fullW0 = geom0.fullW, fullH0 = geom0.fullH;
+
+    // Live crop values mutated during the drag, committed once on release
+    const live = { cropT: item.cropT, cropB: item.cropB, cropL: item.cropL, cropR: item.cropR };
+
+    // Replicate getGeom() exactly and write straight to the DOM — no React render
+    const apply = () => {
+      const block = blockRefs.current.get(imageId);
+      const img = imgRefs.current.get(imageId);
+      if (!block || !img) return;
+      const visW = nw * (1 - live.cropL - live.cropR);
+      const visH = nh * (1 - live.cropT - live.cropB);
+      let s: number, blockW: number, blockH: number;
+      if (mode === "vertical") { s = PREVIEW_W / visW; blockW = PREVIEW_W; blockH = visH * s; }
+      else { s = PREVIEW_H / visH; blockH = PREVIEW_H; blockW = visW * s; }
+      const fullW = nw * s, fullH = nh * s, offL = live.cropL * nw * s, offT = live.cropT * nh * s;
+      block.style.width = blockW + "px";
+      block.style.height = blockH + "px";
+      img.style.width = fullW + "px";
+      img.style.height = fullH + "px";
+      img.style.left = -offL + "px";
+      img.style.top = -offT + "px";
+    };
 
     const onMove = (ev: MouseEvent | TouchEvent) => {
-      if (!cropDragRef.current) return;
-      const { edge, startX, startY, startVal, imageId, fullW, fullH } = cropDragRef.current;
-      const cx = "touches" in ev ? ev.touches[0].clientX : ev.clientX;
-      const cy = "touches" in ev ? ev.touches[0].clientY : ev.clientY;
-      // Divide by zoomLevel so drag speed matches screen pixels
-      const dx = (cx - startX) / zoomLevel;
-      const dy = (cy - startY) / zoomLevel;
-      setImages((curr) =>
-        curr.map((img) => {
-          if (img.id !== imageId) return img;
-          const u = { ...img };
-          if (edge === "top")    u.cropT = Math.max(0, Math.min(1 - img.cropB - MIN_VIS, startVal + dy / fullH));
-          if (edge === "bottom") u.cropB = Math.max(0, Math.min(1 - img.cropT - MIN_VIS, startVal - dy / fullH));
-          if (edge === "left")   u.cropL = Math.max(0, Math.min(1 - img.cropR - MIN_VIS, startVal + dx / fullW));
-          if (edge === "right")  u.cropR = Math.max(0, Math.min(1 - img.cropL - MIN_VIS, startVal - dx / fullW));
-          return u;
-        })
-      );
+      if ("touches" in ev) ev.preventDefault();
+      const cx = "touches" in ev ? ev.touches[0].clientX : (ev as MouseEvent).clientX;
+      const cy = "touches" in ev ? ev.touches[0].clientY : (ev as MouseEvent).clientY;
+      const dx = (cx - startX) / z;
+      const dy = (cy - startY) / z;
+      if (edge === "top")    live.cropT = Math.max(0, Math.min(1 - live.cropB - MIN_VIS, item.cropT + dy / fullH0));
+      if (edge === "bottom") live.cropB = Math.max(0, Math.min(1 - live.cropT - MIN_VIS, item.cropB - dy / fullH0));
+      if (edge === "left")   live.cropL = Math.max(0, Math.min(1 - live.cropR - MIN_VIS, item.cropL + dx / fullW0));
+      if (edge === "right")  live.cropR = Math.max(0, Math.min(1 - live.cropL - MIN_VIS, item.cropR - dx / fullW0));
+      // Write straight to the DOM on the move event itself — browsers already throttle
+      // mousemove to ~one per frame, so this is smooth with zero React/transition lag.
+      apply();
     };
     const onUp = () => {
-      cropDragRef.current = null;
       document.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseup", onUp);
       document.removeEventListener("touchmove", onMove);
       document.removeEventListener("touchend", onUp);
+      // Commit the final crop to state once (identical geometry → no jump)
+      setImages((curr) => curr.map((im) => im.id === imageId ? { ...im, ...live } : im));
     };
     document.addEventListener("mousemove", onMove);
     document.addEventListener("mouseup", onUp);
@@ -335,7 +351,7 @@ export default function App() {
                 No images yet
               </p>
             ) : (
-              <div className="grid grid-cols-2 gap-1.5">
+              <div className="flex flex-col gap-2">
                 {images.map((item, index) => {
                   const isSelected = item.id === selectedId;
                   return (
@@ -347,7 +363,7 @@ export default function App() {
                       onDragEnd={() => setDraggedId(null)}
                       onDragOver={(e) => e.preventDefault()}
                       onDrop={(e) => { e.preventDefault(); handleDrop(item.id); }}
-                      className={`relative group cursor-pointer aspect-square overflow-hidden transition-all duration-150 ${
+                      className={`relative group cursor-pointer w-full overflow-hidden transition-all duration-150 ${
                         draggedId === item.id ? "opacity-30 scale-95" : ""
                       }`}
                       style={{
@@ -357,17 +373,17 @@ export default function App() {
                     >
                       <img
                         src={item.src} alt=""
-                        className="w-full h-full object-cover pointer-events-none"
+                        className="w-full h-auto block object-contain pointer-events-none bg-[#F5F2ED]"
                         referrerPolicy="no-referrer"
                       />
                       {/* Number badge */}
-                      <span className="absolute bottom-0.5 left-0.5 text-[8px] font-bold font-mono text-white bg-black/50 px-1 leading-4 select-none">
+                      <span className="absolute bottom-1 left-1 text-[9px] font-bold font-mono text-white bg-black/55 px-1.5 leading-4 select-none">
                         {index + 1}
                       </span>
                       {/* Delete button */}
                       <button
                         onClick={(e) => { e.stopPropagation(); deleteImage(item.id); }}
-                        className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/60 text-white text-[10px] font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full leading-none select-none"
+                        className="absolute top-1 right-1 w-5 h-5 bg-black/60 text-white text-[11px] font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full leading-none select-none"
                         title="Remove"
                       >×</button>
                     </div>
@@ -439,8 +455,9 @@ export default function App() {
 
                         {/* Image block */}
                         <div
+                          ref={(el) => { if (el) blockRefs.current.set(item.id, el); else blockRefs.current.delete(item.id); }}
                           onClick={(e) => { e.stopPropagation(); setSelectedId(item.id); }}
-                          className="relative shrink-0 overflow-hidden group cursor-pointer transition-all duration-200"
+                          className="relative shrink-0 overflow-hidden group cursor-pointer"
                           style={{
                             width: geom.blockW,
                             height: geom.blockH,
@@ -451,6 +468,7 @@ export default function App() {
                           }}
                         >
                           <img
+                            ref={(el) => { if (el) imgRefs.current.set(item.id, el); else imgRefs.current.delete(item.id); }}
                             src={item.src} alt=""
                             className="absolute pointer-events-none max-w-none"
                             style={{ width: geom.fullW, height: geom.fullH, left: -geom.offL, top: -geom.offT }}
