@@ -35,6 +35,8 @@ export default function App() {
   const [images, setImages] = useState<StitchItem[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [draggedId, setDraggedId] = useState<string | null>(null);
+  // Insertion indicator while reordering: target item id + whether to drop before/after it ("end" = tail zone)
+  const [dropHint, setDropHint] = useState<{ id: string; pos: "before" | "after" } | "end" | null>(null);
   const [stitchMode, setStitchMode] = useState<"vertical" | "horizontal">("vertical");
   const [zoomLevel, setZoomLevel] = useState<number>(0.9);
   const [statusMsg, setStatusMsg] = useState<{ text: string; mode: "ok" | "err" | "" }>({ text: "", mode: "" });
@@ -103,18 +105,44 @@ export default function App() {
   };
 
   /* ── Sidebar drag-reorder ── */
-  const handleDrop = (targetId: string) => {
-    if (!draggedId || draggedId === targetId) return;
+  // Decide before/after based on cursor position within the hovered item
+  const onItemDragOver = (e: React.DragEvent, targetId: string) => {
+    e.preventDefault();
+    if (!draggedId || draggedId === targetId) { setDropHint(null); return; }
+    const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const pos = e.clientY > r.top + r.height / 2 ? "after" : "before";
+    setDropHint({ id: targetId, pos });
+  };
+
+  const moveTo = (targetId: string, pos: "before" | "after") => {
+    if (!draggedId) return;
     setImages((curr) => {
       const from = curr.findIndex((i) => i.id === draggedId);
-      const to = curr.findIndex((i) => i.id === targetId);
-      if (from === -1 || to === -1) return curr;
+      if (from === -1) return curr;
       const copy = [...curr];
-      const [removed] = copy.splice(from, 1);
-      copy.splice(to, 0, removed);
+      const [moved] = copy.splice(from, 1);
+      let to = copy.findIndex((i) => i.id === targetId);
+      if (to === -1) return curr;
+      if (pos === "after") to += 1;
+      copy.splice(to, 0, moved);
       return copy;
     });
   };
+
+  // Drop in the trailing zone → move dragged item to the very end
+  const moveToEnd = () => {
+    if (!draggedId) return;
+    setImages((curr) => {
+      const from = curr.findIndex((i) => i.id === draggedId);
+      if (from === -1) return curr;
+      const copy = [...curr];
+      const [moved] = copy.splice(from, 1);
+      copy.push(moved);
+      return copy;
+    });
+  };
+
+  const endDrag = () => { setDraggedId(null); setDropHint(null); };
 
   /* ── Geometry ── */
   const getGeom = (item: StitchItem) => {
@@ -354,15 +382,23 @@ export default function App() {
               <div className="flex flex-col gap-2">
                 {images.map((item, index) => {
                   const isSelected = item.id === selectedId;
+                  const hintBefore = typeof dropHint === "object" && dropHint?.id === item.id && dropHint.pos === "before";
+                  const hintAfter = typeof dropHint === "object" && dropHint?.id === item.id && dropHint.pos === "after";
                   return (
                     <div
                       key={item.id}
                       onClick={() => setSelectedId(item.id)}
                       draggable
                       onDragStart={(e) => { setDraggedId(item.id); e.dataTransfer.effectAllowed = "move"; }}
-                      onDragEnd={() => setDraggedId(null)}
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={(e) => { e.preventDefault(); handleDrop(item.id); }}
+                      onDragEnd={endDrag}
+                      onDragOver={(e) => onItemDragOver(e, item.id)}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                        const pos = e.clientY > r.top + r.height / 2 ? "after" : "before";
+                        moveTo(item.id, pos);
+                        endDrag();
+                      }}
                       className={`relative group cursor-pointer w-full overflow-hidden transition-all duration-150 ${
                         draggedId === item.id ? "opacity-30 scale-95" : ""
                       }`}
@@ -371,6 +407,9 @@ export default function App() {
                         outlineOffset: "1px",
                       }}
                     >
+                      {/* Insertion indicator (orange line) */}
+                      {hintBefore && <div className="absolute -top-1 left-0 right-0 h-1 bg-[#F97316] rounded-full z-10 pointer-events-none" />}
+                      {hintAfter && <div className="absolute -bottom-1 left-0 right-0 h-1 bg-[#F97316] rounded-full z-10 pointer-events-none" />}
                       <img
                         src={item.src} alt=""
                         className="w-full h-auto block object-contain pointer-events-none bg-[#F5F2ED]"
@@ -389,6 +428,15 @@ export default function App() {
                     </div>
                   );
                 })}
+                {/* Trailing drop zone — release here to move an image to the very end */}
+                <div
+                  onDragOver={(e) => { e.preventDefault(); if (draggedId) setDropHint("end"); }}
+                  onDrop={(e) => { e.preventDefault(); moveToEnd(); endDrag(); }}
+                  className="h-8 flex items-center justify-center transition-all"
+                  style={{ outline: dropHint === "end" ? "2px dashed #F97316" : "2px dashed transparent" }}
+                >
+                  {dropHint === "end" && <span className="text-[9px] font-bold uppercase tracking-widest text-[#F97316] select-none pointer-events-none">Drop to end</span>}
+                </div>
               </div>
             )}
           </div>
